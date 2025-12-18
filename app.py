@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -543,3 +542,4 @@ else:
     # Add feature diagram
     st.image("https://raw.githubusercontent.com/plotly/datasets/master/sample_image.png", 
              caption="Justice Gap Analysis Workflow", use_column_width=True)
+
