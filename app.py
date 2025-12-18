@@ -1,74 +1,50 @@
-# app.py - SIMPLE VERSION
+# app_simple.py
 import streamlit as st
 import pandas as pd
-import numpy as np
 
-# Page config
-st.set_page_config(
-    page_title="Justice Gap Analyzer",
-    page_icon="⚖️",
-    layout="wide"
-)
+st.title("Justice Gap Analyzer - Basic Version")
+st.write("This is a working version with minimal dependencies.")
 
-# Title
-st.title("⚖️ Systemic Justice Gap Analyzer")
-st.markdown("**Using FP-Growth Association Rule Mining**")
+# Load data
+@st.cache_data
+def load_data():
+    try:
+        df = pd.read_csv("legal_aid_dataset.csv")
+        return df, True
+    except:
+        # Create sample data if file doesn't exist
+        data = {
+            'Case_ID': range(1, 101),
+            'Case_Type': ['Domestic_Violence', 'Property_Dispute', 'Criminal'] * 33 + ['Domestic_Violence'],
+            'Gender': ['Male', 'Female'] * 50,
+            'Delay_Flag': [1, 0] * 50,
+            'Income_Bracket': ['Low', 'Medium', 'High'] * 33 + ['Low']
+        }
+        df = pd.DataFrame(data)
+        return df, False
 
-# Check if we can load data
-try:
-    df = pd.read_csv("legal_aid_dataset.csv")
-    st.success(f"✅ Successfully loaded {len(df)} records")
-    
-    # Show basic info
-    st.subheader("Dataset Preview")
-    st.dataframe(df.head())
-    
-    # Basic stats
-    st.subheader("Statistics")
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.metric("Total Cases", len(df))
-    
-    with col2:
-        if 'Case_Type' in df.columns:
-            st.metric("Case Types", df['Case_Type'].nunique())
-    
-    with col3:
-        if 'Delay_Flag' in df.columns:
-            delay_rate = df['Delay_Flag'].mean() * 100
-            st.metric("Delay Rate", f"{delay_rate:.1f}%")
-    
-    # Simple analysis
-    if 'Case_Type' in df.columns and 'Delay_Flag' in df.columns:
-        st.subheader("Delay Analysis by Case Type")
-        delay_by_type = df.groupby('Case_Type')['Delay_Flag'].mean().sort_values(ascending=False)
-        st.bar_chart(delay_by_type)
-    
-except Exception as e:
-    st.error(f"❌ Error loading data: {str(e)}")
-    st.info("Please make sure 'legal_aid_dataset.csv' is in the same directory.")
+df, file_exists = load_data()
 
-# Test if modules can be imported
-st.subheader("Module Test")
-try:
-    import sklearn
-    st.success("✅ scikit-learn imported successfully")
-except:
-    st.warning("⚠️ scikit-learn not available")
+if file_exists:
+    st.success("Real data loaded")
+else:
+    st.info("Using sample data")
 
-try:
-    import mlxtend
-    st.success("✅ mlxtend imported successfully")
-except:
-    st.warning("⚠️ mlxtend not available")
+# Show data
+st.subheader("Data Preview")
+st.dataframe(df)
 
-try:
-    import plotly
-    st.success("✅ plotly imported successfully")
-except:
-    st.warning("⚠️ plotly not available")
+# Analysis
+st.subheader("Analysis")
+if 'Delay_Flag' in df.columns and 'Case_Type' in df.columns:
+    # Calculate delay rates
+    delay_analysis = df.groupby('Case_Type')['Delay_Flag'].agg(['mean', 'count'])
+    delay_analysis['mean'] = delay_analysis['mean'] * 100
+    
+    st.write("Delay Rates by Case Type:")
+    st.dataframe(delay_analysis)
+    
+    # Simple chart
+    st.bar_chart(delay_analysis['mean'])
 
-# Footer
-st.markdown("---")
-st.markdown("**App Status: Testing Dependencies**")
+st.write("App is working! ✅")
