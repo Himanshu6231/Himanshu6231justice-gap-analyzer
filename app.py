@@ -128,4 +128,5 @@ with st.expander("📖 How to Use This App"):
 
 # Footer
 st.markdown("---")
-st.markdown("**Systemic Justice Gap Identification** • *Basic Working Version*")c
+st.markdown("**Systemic Justice Gap Identification** • *Basic Working Version*")
+
